@@ -57,6 +57,10 @@ const (
 	JSON LogFormat = 1
 )
 
+const (
+	AutoIndex uint64 = 0
+)
+
 // Options for Log
 type Options struct {
 	// NoSync disables fsync after writes. This is less durable and puts the
@@ -315,6 +319,9 @@ func (l *Log) Write(index uint64, data []byte) error {
 	} else if l.closed {
 		return ErrClosed
 	}
+	if index == AutoIndex {
+		index = l.lastIndex + 1
+	}
 	l.wbatch.Clear()
 	l.wbatch.Write(index, data)
 	return l.writeBatch(&l.wbatch)
@@ -431,6 +438,10 @@ func (l *Log) WriteBatch(b *Batch) error {
 func (l *Log) writeBatch(b *Batch) error {
 	// check that all indexes in batch are sane
 	for i := 0; i < len(b.entries); i++ {
+		if b.entries[i].index == AutoIndex {
+			b.entries[i].index = l.lastIndex + uint64(i+1)
+			continue
+		}
 		if b.entries[i].index != l.lastIndex+uint64(i+1) {
 			return ErrOutOfOrder
 		}
