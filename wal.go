@@ -93,7 +93,7 @@ var DefaultOptions = &Options{
 	NoCopy:           false,    // Make a new copy of data for every Read call.
 	DirPerms:         0750,     // Permissions for the created directories
 	FilePerms:        0640,     // Permissions for the created data files
-	AllowEmpty:       false,    // Disallow empty log truncation for backwards compatibility
+	AllowEmpty:       true,     // Disallow empty log truncation for backwards compatibility
 }
 
 // Log represents a write ahead log
